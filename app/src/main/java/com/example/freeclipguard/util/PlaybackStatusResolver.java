@@ -37,7 +37,7 @@ public final class PlaybackStatusResolver {
         return context.getString(R.string.status_playback_disconnected);
     }
 
-    private static boolean isAnyBluetoothAudioProfileConnected(Context context) {
+    public static boolean isAnyBluetoothAudioProfileConnected(Context context) {
         if (!PermissionHelper.hasBluetoothConnectPermission(context)) {
             return false;
         }

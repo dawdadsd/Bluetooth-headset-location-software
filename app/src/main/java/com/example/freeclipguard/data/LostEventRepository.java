@@ -55,7 +55,7 @@ public final class LostEventRepository {
             @Nullable Integer rssi,
             @Nullable String note,
             @Nullable Runnable onComplete) {
-        recordEvent(boundDeviceStore, bluetoothDevice, source, EVENT_TYPE_DISCONNECTED, rssi, note, onComplete);
+        recordEvent(boundDeviceStore, bluetoothDevice, source, EVENT_TYPE_DISCONNECTED, rssi, note, true, onComplete);
     }
 
     public void recordConnect(BoundDeviceStore boundDeviceStore,
@@ -64,7 +64,7 @@ public final class LostEventRepository {
             @Nullable Integer rssi,
             @Nullable String note,
             @Nullable Runnable onComplete) {
-        recordEvent(boundDeviceStore, bluetoothDevice, source, EVENT_TYPE_CONNECTED, rssi, note, onComplete);
+        recordEvent(boundDeviceStore, bluetoothDevice, source, EVENT_TYPE_CONNECTED, rssi, note, false, onComplete);
     }
 
     private void recordEvent(BoundDeviceStore boundDeviceStore,
@@ -73,6 +73,7 @@ public final class LostEventRepository {
             String eventType,
             @Nullable Integer rssi,
             @Nullable String note,
+            boolean notify,
             @Nullable Runnable onComplete) {
         executorService.execute(() -> {
             BoundDevice boundDevice = boundDeviceStore.getBoundDevice();
@@ -108,12 +109,12 @@ public final class LostEventRepository {
             }
             event.id = appDatabase.lostEventDao().insert(event);
 
-            if (!connected) {
+            if (connected) {
+                boundDeviceStore.setDisconnectNotified(false);
+            } else if (notify && !boundDeviceStore.isDisconnectNotified()) {
                 DisconnectOverlayManager.show(appContext, event, disconnectPrompt);
                 NotificationHelper.showDisconnectAlert(appContext, event, disconnectPrompt);
-            }
-            else {
-                NotificationHelper.showConnectionRecorded(appContext, event);
+                boundDeviceStore.setDisconnectNotified(true);
             }
             if (onComplete != null) {
                 mainHandler.post(onComplete);

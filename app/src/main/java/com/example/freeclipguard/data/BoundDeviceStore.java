@@ -28,6 +28,7 @@ public final class BoundDeviceStore {
     private static final String KEY_DISCONNECT_ALERT_PROMPT = "disconnect_alert_prompt";
     private static final String KEY_SAVED_PLACE_NOTE = "saved_place_note";
     private static final String KEY_SAVED_PLACE_AT = "saved_place_at";
+    private static final String KEY_DISCONNECT_NOTIFIED = "disconnect_notified";
 
     private final Context appContext;
     private final SharedPreferences preferences;
@@ -168,5 +169,13 @@ public final class BoundDeviceStore {
 
     public long getManualPlaceSavedAt() {
         return preferences.getLong(KEY_SAVED_PLACE_AT, 0L);
+    }
+
+    public void setDisconnectNotified(boolean notified) {
+        preferences.edit().putBoolean(KEY_DISCONNECT_NOTIFIED, notified).apply();
+    }
+
+    public boolean isDisconnectNotified() {
+        return preferences.getBoolean(KEY_DISCONNECT_NOTIFIED, false);
     }
 }
